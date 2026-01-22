@@ -1,0 +1,56 @@
+{
+  "name": "tech-challenge-2",
+  "version": "1.0.0",
+  "main": "app.ts",
+  "repository": "git@github.com:joice-flores/tech-challenge-2.git",
+  "author": "joice-flores <joicefloreslazarino@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node -r tsconfig-paths/register dist/server.js",
+    "prod": "yarn build && yarn start",
+    "type-check": "tsc --noEmit",
+    "test": "jest --coverage --runInBand",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --coverageReporters=text-lcov --coverageReporters=html",
+    "test:ci": "jest --coverage --ci --runInBand --maxWorkers=2",
+    "lint": "echo \"Linting...\" && yarn type-check",
+    "format": "echo \"Formatting not configured\"",
+    "docker:build": "docker build -t tech-challenge-2 .",
+    "docker:run": "docker run -p 3000:3000 tech-challenge-2",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "module-alias": "^2.2.3",
+    "mongoose": "^9.1.5",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/module-alias": "^2.0.4",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^25.0.10",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.1.6",
+    "nodemon": "^3.1.11",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  },
+  "_moduleAliases": {
+    "~": "dist"
+  }
+}

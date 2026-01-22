@@ -1,0 +1,526 @@
+{
+  "info": {
+    "name": "Tech Challenge 2 - API",
+    "description": "Collection da API do Tech Challenge 2 - Plataforma Educacional\n\n**Características:**\n- Autenticação JWT (validade: 7 dias)\n- Registro fechado (apenas admin cria usuários)\n- Roles: Teacher e Admin\n- Posts com autor automático (authorId)\n- Busca inteligente (ignora acentos e maiúsculas)\n- Leitura pública de posts\n\n**Estrutura:**\n- Authentication: Login e gestão de perfil\n- Admin: Criar/listar/deletar usuários (apenas admin)\n- Posts: CRUD completo + busca avançada\n\nVersão 3.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.environment.set(\"jwt_token\", response.data.token);",
+                  "        pm.environment.set(\"user_id\", response.data.user.id);",
+                  "        console.log(\"Token salvo:\", response.data.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Faz login com email e senha. Retorna token JWT que é salvo automaticamente no environment."
+          },
+          "response": []
+        },
+        {
+          "name": "Meus Dados (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT obtido no login"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Retorna dados do usuário autenticado. Requer token JWT no header."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Meus Dados",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT obtido no login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Atualiza dados do usuário autenticado. Requer token JWT. Todos os campos são opcionais."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Senha",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT obtido no login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"novaSenha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Atualiza apenas a senha do usuário. A senha é automaticamente hasheada."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de autenticação com JWT - Login e gestão de usuário"
+    },
+    {
+      "name": "Admin",
+      "description": "Endpoints administrativos para gerenciar usuários (apenas admin). Apenas teachers e admins podem ter contas no sistema.",
+      "item": [
+        {
+          "name": "Criar Usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.environment.set(\"new_user_id\", response.data.id);",
+                  "        console.log(\"Usuário criado com ID:\", response.data.id);",
+                  "        console.log(\"Role:\", response.data.role);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text",
+                "description": "Token do ADMIN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Professor João\",\n  \"email\": \"prof.joao@escola.com\",\n  \"password\": \"senha123\",\n  \"cpf\": \"12345678901\",\n  \"role\": \"teacher\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users"]
+            },
+            "description": "Cria um novo usuário no sistema. Apenas admin pode criar usuários. Role é obrigatória e deve ser 'teacher' ou 'admin'. CPF é opcional."
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text",
+                "description": "Token do ADMIN"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Novo Admin\",\n  \"email\": \"novo.admin@escola.com\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users"]
+            },
+            "description": "Exemplo de criação de outro admin. Role 'admin' permite acesso total ao sistema."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todos os Usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users"]
+            },
+            "description": "Lista todos os usuários do sistema (teachers e admins). Apenas admin pode acessar."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "{{user_id}}"]
+            },
+            "description": "Busca detalhes de um usuário específico por ID. Apenas admin pode acessar."
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{new_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "{{new_user_id}}"]
+            },
+            "description": "Deleta um usuário do sistema. Admin não pode deletar a si mesmo. Apenas admin pode executar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Listar Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            },
+            "description": "Lista todos os posts com dados completos do autor (name, email, role). Público - não requer autenticação."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Post por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["posts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{post_id}}",
+                  "description": "ID do post"
+                }
+              ]
+            },
+            "description": "Busca um post específico por ID com dados completos do autor (name, email, role). Público - não requer autenticação."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Posts por Autor ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/author/:authorId",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "author", ":authorId"],
+              "variable": [
+                {
+                  "key": "authorId",
+                  "value": "{{user_id}}",
+                  "description": "ID do autor (teacher)"
+                }
+              ]
+            },
+            "description": "Lista todos os posts de um autor específico pelo ID do teacher (público - não requer autenticação). Use o ID do teacher salvo em {{user_id}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por Palavra-chave",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/posts/search?keyword=javascript",
+              "host": ["{{base_url}}"],
+              "path": ["posts", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "javascript",
+                  "description": "Palavra-chave (ignora maiúsculas e acentos)"
+                }
+              ]
+            },
+            "description": "Busca posts por palavra-chave com busca inteligente.\n\n**Busca em:**\n- Título do post\n- Conteúdo do post\n- Nome do teacher (autor)\n\n**Características:**\n- Ignora maiúsculas/minúsculas (João = joao = JOÃO)\n- Ignora acentos (jose = José = JOSÉ)\n- Locale PT-BR para melhor compatibilidade\n\n**Exemplos:**\n- keyword=jose → Encontra posts de \"José Silva\"\n- keyword=programacao → Encontra \"Programação\", \"PROGRAMACAO\", etc.\n- keyword=JAVA → Encontra \"Java\", \"javascript\", etc.\n\nPúblico - não requer autenticação."
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response._id) {",
+                  "        pm.environment.set(\"post_id\", response._id);",
+                  "        console.log(\"Post criado com ID:\", response._id);",
+                  "        console.log(\"Autor:\", response.authorId.name);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT - Requer role teacher ou admin"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Meu Primeiro Post\",\n  \"content\": \"Este é o conteúdo do meu post. Deve ter pelo menos 10 caracteres.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            },
+            "description": "Cria um novo post. O autor é automaticamente definido como o usuário logado (authorId). Requer autenticação JWT com role teacher ou admin. A resposta inclui dados completos do autor (name, email, role)."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT - Requer role teacher ou admin"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Post Atualizado\",\n  \"content\": \"Conteúdo atualizado do post\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/posts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["posts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{post_id}}",
+                  "description": "ID do post"
+                }
+              ]
+            },
+            "description": "Atualiza um post existente. Requer autenticação JWT com role teacher (apenas próprio post) ou admin (qualquer post)."
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "description": "Token JWT - Requer role teacher ou admin"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/posts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["posts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{post_id}}",
+                  "description": "ID do post"
+                }
+              ]
+            },
+            "description": "Deleta um post. Requer autenticação JWT com role teacher (apenas próprio post) ou admin (qualquer post)."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD de Posts - Leitura pública, escrita restrita a teachers/admins\n\n**Regras de Autoria:**\n- Teachers: podem editar/deletar APENAS seus próprios posts\n- Admins: podem editar/deletar QUALQUER post\n\n**Validação:**\n- Todos os posts têm campo authorId (ObjectId do teacher)\n- Sistema verifica se post.authorId === req.user.id\n- Se não for autor E não for admin → 403 Forbidden\n\n**Importante:**\nPosts antigos criados antes da refatoração (com campo 'author' string) foram removidos. Todos os posts agora usam 'authorId' (ObjectId)."
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string",
+      "description": "Token principal (admin ou teacher logado)"
+    },
+    {
+      "key": "teacher_token",
+      "value": "",
+      "type": "string",
+      "description": "Token de um teacher específico"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "ID do usuário logado"
+    },
+    {
+      "key": "new_user_id",
+      "value": "",
+      "type": "string",
+      "description": "ID do último usuário criado"
+    },
+    {
+      "key": "post_id",
+      "value": "",
+      "type": "string",
+      "description": "ID do último post criado"
+    },
+    {
+      "key": "teacher_a_id",
+      "value": "",
+      "type": "string",
+      "description": "ID do Teacher A (fluxo de teste de autoria)"
+    },
+    {
+      "key": "teacher_a_token",
+      "value": "",
+      "type": "string",
+      "description": "Token do Teacher A"
+    },
+    {
+      "key": "teacher_b_token",
+      "value": "",
+      "type": "string",
+      "description": "Token do Teacher B"
+    },
+    {
+      "key": "teacher_a_post_id",
+      "value": "",
+      "type": "string",
+      "description": "ID do post criado pelo Teacher A"
+    }
+  ]
+}
