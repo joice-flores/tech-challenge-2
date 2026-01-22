@@ -4,7 +4,7 @@
 # ================================
 # Stage: Base
 # ================================
-FROM node:20-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /app
 COPY package.json yarn.lock ./
 
@@ -40,7 +40,7 @@ RUN yarn build
 # ================================
 # Stage: Production
 # ================================
-FROM node:20-alpine AS production
+FROM node:25-alpine AS production
 WORKDIR /app
 
 # Copia arquivos de dependências
