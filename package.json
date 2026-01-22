@@ -14,7 +14,7 @@
     "test": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --coverageReporters=text-lcov --coverageReporters=html",
-    "test:ci": "jest --coverage --ci --runInBand --maxWorkers=2",
+    "test:ci": "jest --coverage --ci --runInBand",
     "lint": "echo \"Linting...\" && yarn type-check",
     "format": "echo \"Formatting not configured\"",
     "docker:build": "docker build -t tech-challenge-2 .",
