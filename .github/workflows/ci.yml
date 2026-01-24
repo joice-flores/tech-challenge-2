@@ -33,19 +33,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --force
 
       - name: Lint (TypeScript check)
         run: yarn tsc --noEmit
 
       - name: Build
         run: yarn build
-
-      - name: Clear Jest cache
-        run: yarn jest --clearCache
 
       - name: Test
         env:
