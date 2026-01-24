@@ -1,3 +1,6 @@
+## Video da apresentação
+https://www.canva.com/design/DAG_SZzYHKs/ixTfKu0dRSBOft0g_MNWfQ/watch?utm_content=DAG_SZzYHKs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4f0d9a959e
+
 # 🎓 Tech Challenge 2 - Plataforma Educacional
 
 API RESTful com Node.js, TypeScript, Express e MongoDB para posts educacionais com autenticação JWT e controle de acesso baseado em roles.
