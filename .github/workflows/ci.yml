@@ -44,6 +44,9 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Clear Jest cache
+        run: yarn jest --clearCache
+
       - name: Test
         env:
           MONGO_URL_TEST: mongodb://localhost:27017/tech-challenge-2-test
