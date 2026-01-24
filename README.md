@@ -22,7 +22,7 @@ Sistema de API para conteúdo educacional com dois tipos de usuários:
 
 **Admin:** Criação usuários (teachers/admins) | Listar/buscar/deletar usuários (exceto si mesmo)
 
-**Middlewares:** JWT, autorização roles, validação, erros global, logger
+**Middlewares:** JWT, autorização roles, validação, erros global
 
 ## 🚀 Tecnologias
 
@@ -212,7 +212,7 @@ Client → Express (routes) → Middlewares (auth, validation) → Controllers �
 src/
 ├── configs/database.ts          # MongoDB
 ├── controllers/                 # Lógica (Auth, Admin, Post)
-├── middlewares/                 # auth, errorHandler, logger, validate
+├── middlewares/                 # auth, errorHandler, validate
 ├── models/                      # User, Post (Mongoose schemas)
 ├── routes/                      # authRoutes, adminRoutes, postRoutes
 ├── app.ts                       # Express config

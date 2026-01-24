@@ -16,8 +16,12 @@ declare global {
   }
 }
 
-// Middleware de autenticação simples com API Key
-export function authenticate(req: Request, res: Response, next: NextFunction): void {
+// Middleware de autenticação
+export function authenticate(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   try {
     const apiKey = req.headers["x-api-key"] as string;
 
@@ -25,15 +29,14 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
       throw new AppError("API Key não fornecida", 401);
     }
 
-    // Aqui você faria a validação real da API Key
-    // Por exemplo, verificar no banco de dados
+    // Validação real da API Key
     const validApiKey = process.env.API_KEY || "seu-api-key-secreto";
 
     if (apiKey !== validApiKey) {
       throw new AppError("API Key inválida", 401);
     }
 
-    // Adicionar informações do usuário ao request
+    // Adiciona informações do usuário ao request
     req.user = {
       id: "user-123",
       email: "user@example.com",
@@ -65,11 +68,11 @@ export function authorize(...allowedRoles: string[]) {
   };
 }
 
-// Middleware de verificação de Bearer Token (JWT)
+// Middleware de verificação de Token
 export async function verifyToken(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
